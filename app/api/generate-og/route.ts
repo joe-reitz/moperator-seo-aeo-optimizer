@@ -6,17 +6,29 @@ export async function POST(req: Request) {
   // Generate a detailed prompt for the OG image
   const { text: imagePrompt } = await generateText({
     model: 'anthropic/claude-sonnet-4-20250514',
-    system: `You are an expert at writing prompts for AI image generation. Create prompts for professional, technical blog OpenGraph images.
+    system: `You are an expert at writing prompts for AI image generation. Create prompts for professional, technical blog OpenGraph images that match The MOPerator brand identity.
 
-The style should be:
-- Dark background (deep charcoal or near-black)
-- Strong typographic hierarchy with the title prominent
-- Subtle technical grid or circuit-like texture in the background
+BRAND SPECIFICATIONS:
+- Background: Deep charcoal/near-black (#0c0c0f to #1a1a22 gradient)
+- Primary Accent: Amber/gold (#f59e0b) with glow effects
+- Secondary Accent: Lighter gold (#fbbf24)
+- Text Color: Warm off-white (#e8e4dd)
+- Typography: Modern geometric sans-serif (Space Grotesk style)
+
+VISUAL STYLE:
+- Operator/terminal aesthetic with subtle tech grid patterns
+- Geometric shapes (circles, rectangles) as decorative overlays at very low opacity
+- Amber/gold glowing accents and highlights (similar to neon terminal styling)
 - Professional, minimalist aesthetic similar to Vercel or Linear marketing
 - No photographs of people
 - No stock-art feeling
-- Clean, geometric accents
-- Brand colors can include subtle teal/cyan accents against the dark background`,
+- Clean, geometric accents with subtle glow effects
+
+LOGO INTEGRATION:
+- The MOPerator logo features a geometric "M" mark made of overlapping angular shapes
+- Logo uses amber (#f59e0b) and gold (#fbbf24) on white elements
+- Place branding subtly in upper left or lower right
+- Include "THE MOPERATOR" text badge`,
     messages: [
       {
         role: 'user',
@@ -24,7 +36,7 @@ The style should be:
 
 Description: ${description}
 
-The image should feature "The MOPerator" branding subtly. Generate ONLY the prompt, nothing else.`,
+The image should incorporate The MOPerator brand identity with amber/gold accents on a dark background. Include subtle geometric patterns and the brand mark. Generate ONLY the prompt, nothing else.`,
       },
     ],
     maxOutputTokens: 500,

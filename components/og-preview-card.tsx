@@ -47,37 +47,74 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
         <CardTitle className="text-base font-medium">OpenGraph Image Preview</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* OG Image Preview Mockup */}
-        <div className="aspect-[1200/630] w-full rounded-lg bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 relative overflow-hidden">
+        {/* OG Image Preview Mockup - MOPerator Brand */}
+        <div
+          className="aspect-[1200/630] w-full rounded-lg relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #0c0c0f 0%, #1a1a22 100%)' }}
+        >
           {/* Grid texture overlay */}
-          <div 
-            className="absolute inset-0 opacity-10"
+          <div
+            className="absolute inset-0 opacity-[0.08]"
             style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
-              backgroundSize: '20px 20px',
+              backgroundImage: `linear-gradient(rgba(245,158,11,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.15) 1px, transparent 1px)`,
+              backgroundSize: '24px 24px',
             }}
           />
-          
+
+          {/* Geometric decorative elements */}
+          <div
+            className="absolute top-8 left-8 w-16 h-16 rounded-full opacity-[0.06]"
+            style={{ border: '1px solid #f59e0b' }}
+          />
+          <div
+            className="absolute bottom-12 right-24 w-24 h-24 rounded-full opacity-[0.04]"
+            style={{ border: '1px solid #fbbf24' }}
+          />
+
           {/* Content */}
           <div className="absolute inset-0 flex flex-col justify-between p-6">
-            {/* Top badge */}
+            {/* Top badge with glow */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{
+                  backgroundColor: '#f59e0b',
+                  boxShadow: '0 0 8px rgba(245, 158, 11, 0.6)'
+                }}
+              />
+              <span
+                className="text-xs font-semibold uppercase tracking-wider"
+                style={{ color: '#f59e0b' }}
+              >
                 The MOPerator
               </span>
             </div>
-            
+
             {/* Title */}
             <div className="space-y-2">
-              <h3 className="text-xl font-semibold text-white leading-tight line-clamp-3">
+              <h3
+                className="text-xl font-semibold leading-tight line-clamp-3"
+                style={{ color: '#e8e4dd' }}
+              >
                 {title || 'Your Post Title'}
               </h3>
-              <p className="text-sm text-zinc-400">the-moperator.com</p>
+              <p className="text-sm" style={{ color: '#6b7280' }}>the-moperator.com</p>
             </div>
           </div>
 
-          {/* Decorative accent */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-teal-500/20 to-transparent" />
+          {/* Decorative accent - amber glow */}
+          <div
+            className="absolute top-0 right-0 w-40 h-40"
+            style={{
+              background: 'radial-gradient(circle at top right, rgba(245, 158, 11, 0.15) 0%, transparent 70%)'
+            }}
+          />
+          <div
+            className="absolute bottom-0 left-0 w-32 h-32"
+            style={{
+              background: 'radial-gradient(circle at bottom left, rgba(251, 191, 36, 0.08) 0%, transparent 70%)'
+            }}
+          />
         </div>
 
         <p className="text-xs text-muted-foreground">
