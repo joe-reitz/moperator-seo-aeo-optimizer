@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Copy, Check, Download } from 'lucide-react'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { siteConfig } from '@/lib/config'
 
 interface OGPreviewData {
@@ -20,7 +20,18 @@ interface OGPreviewCardProps {
 export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
   const [promptCopied, setPromptCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [logoDataUri, setLogoDataUri] = useState<string | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
+
+  // Convert SVG to data URI so html2canvas can render it
+  useEffect(() => {
+    fetch('/moperator-icon.svg')
+      .then(res => res.text())
+      .then(svg => {
+        setLogoDataUri(`data:image/svg+xml;base64,${btoa(svg)}`)
+      })
+      .catch(() => {})
+  }, [])
 
   const handleCopyPrompt = async () => {
     if (!ogData?.prompt) return
@@ -34,10 +45,10 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
     setDownloading(true)
     try {
       const html2canvas = (await import('html2canvas')).default
+      const rect = previewRef.current.getBoundingClientRect()
+      const scale = 1200 / rect.width
       const canvas = await html2canvas(previewRef.current, {
-        width: 1200,
-        height: 630,
-        scale: 2,
+        scale,
         useCORS: true,
         backgroundColor: null,
       })
@@ -102,7 +113,7 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
           <div className="absolute inset-0 flex items-center justify-center -translate-y-[15%]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/moperator-icon.svg"
+              src={logoDataUri || '/moperator-icon.svg'}
               alt=""
               className="w-40 h-40 opacity-40"
             />
