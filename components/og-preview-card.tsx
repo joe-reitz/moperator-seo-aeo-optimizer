@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, Check, Download, ImageIcon } from 'lucide-react'
-import { useState } from 'react'
+import { Copy, Check, Download } from 'lucide-react'
+import { useState, useRef, useCallback } from 'react'
 import { siteConfig } from '@/lib/config'
 
 interface OGPreviewData {
@@ -19,6 +19,8 @@ interface OGPreviewCardProps {
 
 export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
   const [promptCopied, setPromptCopied] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   const handleCopyPrompt = async () => {
     if (!ogData?.prompt) return
@@ -26,6 +28,29 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
     setPromptCopied(true)
     setTimeout(() => setPromptCopied(false), 2000)
   }
+
+  const handleDownloadPNG = useCallback(async () => {
+    if (!previewRef.current) return
+    setDownloading(true)
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(previewRef.current, {
+        width: 1200,
+        height: 630,
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+      })
+      const link = document.createElement('a')
+      link.download = `${title ? title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : 'og-image'}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (err) {
+      console.error('Failed to generate PNG:', err)
+    } finally {
+      setDownloading(false)
+    }
+  }, [title])
 
   if (!ogData) {
     return (
@@ -50,6 +75,7 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
       <CardContent className="space-y-4">
         {/* OG Image Preview Mockup - Brand Themed */}
         <div
+          ref={previewRef}
           className="aspect-[1200/630] w-full rounded-lg relative overflow-hidden"
           style={{ background: `linear-gradient(135deg, ${siteConfig.colors.background} 0%, ${siteConfig.colors.backgroundGradientEnd} 100%)` }}
         >
@@ -118,9 +144,17 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
           />
         </div>
 
-        <p className="text-xs text-muted-foreground">
-          Preview mockup. Connect an image generation service to create the actual OG image.
-        </p>
+        {/* Download Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full bg-transparent"
+          onClick={handleDownloadPNG}
+          disabled={downloading}
+        >
+          <Download className="h-3.5 w-3.5" />
+          {downloading ? 'Generating...' : 'Download PNG (1200x630)'}
+        </Button>
 
         {/* Image Generation Prompt */}
         <div className="space-y-2">
@@ -146,22 +180,6 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
             {ogData.prompt}
           </div>
         </div>
-
-        {/* Actions */}
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled className="flex-1 bg-transparent">
-            <Download className="h-3.5 w-3.5" />
-            Download PNG
-          </Button>
-          <Button variant="outline" size="sm" disabled className="flex-1 bg-transparent">
-            <ImageIcon className="h-3.5 w-3.5" />
-            Regenerate
-          </Button>
-        </div>
-        
-        <p className="text-xs text-muted-foreground text-center">
-          Image generation requires fal.ai or similar service integration
-        </p>
       </CardContent>
     </Card>
   )
