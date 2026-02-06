@@ -18,6 +18,7 @@ interface SEOResult {
   canonicalUrl: string
   primaryKeyword: string
   secondaryKeywords: string[]
+  excerpt: string
   schema: {
     context: string
     type: string
@@ -306,6 +307,7 @@ export default function SEOOptimizerPage() {
                       canonicalUrl: seoResult.canonicalUrl,
                       primaryKeyword: seoResult.primaryKeyword,
                       secondaryKeywords: seoResult.secondaryKeywords,
+                      excerpt: seoResult.excerpt,
                     }
                   : null
               }

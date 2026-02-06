@@ -11,6 +11,7 @@ interface SEOMetadata {
   canonicalUrl: string
   primaryKeyword: string
   secondaryKeywords: string[]
+  excerpt: string
 }
 
 interface SEOMetadataCardProps {
@@ -75,6 +76,7 @@ export function SEOMetadataCard({ metadata }: SEOMetadataCardProps) {
       <CardContent className="space-y-4">
         <MetadataRow label="SEO Title" value={metadata.seoTitle} />
         <MetadataRow label="Meta Description" value={metadata.metaDescription} />
+        <MetadataRow label="Excerpt" value={metadata.excerpt} />
         <MetadataRow label="Slug" value={metadata.slug} />
         <MetadataRow label="Canonical URL" value={metadata.canonicalUrl} />
         <MetadataRow label="Primary Keyword" value={metadata.primaryKeyword} />

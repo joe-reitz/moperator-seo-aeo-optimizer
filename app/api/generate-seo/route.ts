@@ -10,6 +10,7 @@ const seoOutputSchema = z.object({
   canonicalUrl: z.string().describe(`Full canonical URL using ${siteConfig.url}`),
   primaryKeyword: z.string().describe('Main keyword to target'),
   secondaryKeywords: z.array(z.string()).describe('3-5 secondary keywords'),
+  excerpt: z.string().describe('2-4 sentence summary of the post for email newsletters and subscriber notifications. Should be compelling enough to drive click-through but substantive, not clickbait. Match the brand tone.'),
   schema: z.object({
     context: z.string(),
     type: z.string().describe('Use "TechArticle" for technical/how-to content, "BlogPosting" for opinion/commentary'),
@@ -129,7 +130,8 @@ Generate content that optimizes for:
 1. Google SEO - rich results, featured snippets, knowledge panels
 2. AEO (Answer Engine Optimization) - AI assistants extracting direct answers
 3. Social preview optimization - X, LinkedIn, Slack unfurls
-4. Voice search - speakable structured data
+4. Email newsletter excerpts - subscriber-facing summaries that drive click-through
+5. Voice search - speakable structured data
 5. E-E-A-T signals - author expertise, entity disambiguation
 
 SCHEMA REQUIREMENTS:
