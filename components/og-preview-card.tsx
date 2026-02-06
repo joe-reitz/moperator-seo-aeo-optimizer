@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Copy, Check, Download, ImageIcon } from 'lucide-react'
 import { useState } from 'react'
+import { siteConfig } from '@/lib/config'
 
 interface OGPreviewData {
   prompt: string
@@ -47,16 +48,16 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
         <CardTitle className="text-base font-medium">OpenGraph Image Preview</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* OG Image Preview Mockup - MOPerator Brand */}
+        {/* OG Image Preview Mockup - Brand Themed */}
         <div
           className="aspect-[1200/630] w-full rounded-lg relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #0c0c0f 0%, #1a1a22 100%)' }}
+          style={{ background: `linear-gradient(135deg, ${siteConfig.colors.background} 0%, ${siteConfig.colors.backgroundGradientEnd} 100%)` }}
         >
           {/* Grid texture overlay */}
           <div
             className="absolute inset-0 opacity-[0.08]"
             style={{
-              backgroundImage: `linear-gradient(rgba(245,158,11,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.15) 1px, transparent 1px)`,
+              backgroundImage: `linear-gradient(${siteConfig.colors.primary}26 1px, transparent 1px), linear-gradient(90deg, ${siteConfig.colors.primary}26 1px, transparent 1px)`,
               backgroundSize: '24px 24px',
             }}
           />
@@ -64,11 +65,11 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
           {/* Geometric decorative elements */}
           <div
             className="absolute top-8 left-8 w-16 h-16 rounded-full opacity-[0.06]"
-            style={{ border: '1px solid #f59e0b' }}
+            style={{ border: `1px solid ${siteConfig.colors.primary}` }}
           />
           <div
             className="absolute bottom-12 right-24 w-24 h-24 rounded-full opacity-[0.04]"
-            style={{ border: '1px solid #fbbf24' }}
+            style={{ border: `1px solid ${siteConfig.colors.secondary}` }}
           />
 
           {/* Content */}
@@ -78,15 +79,15 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
               <div
                 className="w-2 h-2 rounded-full"
                 style={{
-                  backgroundColor: '#f59e0b',
-                  boxShadow: '0 0 8px rgba(245, 158, 11, 0.6)'
+                  backgroundColor: siteConfig.colors.primary,
+                  boxShadow: `0 0 8px ${siteConfig.colors.primary}99`
                 }}
               />
               <span
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: '#f59e0b' }}
+                style={{ color: siteConfig.colors.primary }}
               >
-                The MOPerator
+                {siteConfig.name}
               </span>
             </div>
 
@@ -94,25 +95,25 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
             <div className="space-y-2">
               <h3
                 className="text-xl font-semibold leading-tight line-clamp-3"
-                style={{ color: '#e8e4dd' }}
+                style={{ color: siteConfig.colors.text }}
               >
                 {title || 'Your Post Title'}
               </h3>
-              <p className="text-sm" style={{ color: '#6b7280' }}>the-moperator.com</p>
+              <p className="text-sm" style={{ color: siteConfig.colors.textMuted }}>{siteConfig.domain}</p>
             </div>
           </div>
 
-          {/* Decorative accent - amber glow */}
+          {/* Decorative accent - primary glow */}
           <div
             className="absolute top-0 right-0 w-40 h-40"
             style={{
-              background: 'radial-gradient(circle at top right, rgba(245, 158, 11, 0.15) 0%, transparent 70%)'
+              background: `radial-gradient(circle at top right, ${siteConfig.colors.primary}26 0%, transparent 70%)`
             }}
           />
           <div
             className="absolute bottom-0 left-0 w-32 h-32"
             style={{
-              background: 'radial-gradient(circle at bottom left, rgba(251, 191, 36, 0.08) 0%, transparent 70%)'
+              background: `radial-gradient(circle at bottom left, ${siteConfig.colors.secondary}14 0%, transparent 70%)`
             }}
           />
         </div>

@@ -1,53 +1,57 @@
 import { generateText } from 'ai'
+import { siteConfig } from '@/lib/config'
+import { getModel } from '@/lib/model'
 
 export async function POST(req: Request) {
-  const { title, description } = await req.json()
+  try {
+    const body = await req.json()
+    const { title, description } = body
 
-  // Generate a detailed prompt for the OG image
-  const { text: imagePrompt } = await generateText({
-    model: 'anthropic/claude-sonnet-4-20250514',
-    system: `You are an expert at writing prompts for AI image generation. Create prompts for professional, technical blog OpenGraph images that match The MOPerator brand identity.
+    if (!title?.trim()) {
+      return Response.json(
+        { error: 'Title is required' },
+        { status: 400 }
+      )
+    }
+
+    const { text: imagePrompt } = await generateText({
+      model: getModel(),
+      system: `You are an expert at writing prompts for AI image generation. Create prompts for professional, technical blog OpenGraph images that match the ${siteConfig.name} brand identity.
 
 BRAND SPECIFICATIONS:
-- Background: Deep charcoal/near-black (#0c0c0f to #1a1a22 gradient)
-- Primary Accent: Amber/gold (#f59e0b) with glow effects
-- Secondary Accent: Lighter gold (#fbbf24)
-- Text Color: Warm off-white (#e8e4dd)
-- Typography: Modern geometric sans-serif (Space Grotesk style)
+- Background: Deep charcoal/near-black (${siteConfig.colors.background} to ${siteConfig.colors.backgroundGradientEnd} gradient)
+- Primary Accent: ${siteConfig.colors.primary} with glow effects
+- Secondary Accent: ${siteConfig.colors.secondary}
+- Text Color: ${siteConfig.colors.text}
+- Typography: Modern geometric sans-serif (${siteConfig.fonts.heading} style)
 
 VISUAL STYLE:
-- Operator/terminal aesthetic with subtle tech grid patterns
-- Geometric shapes (circles, rectangles) as decorative overlays at very low opacity
-- Amber/gold glowing accents and highlights (similar to neon terminal styling)
-- Professional, minimalist aesthetic similar to Vercel or Linear marketing
-- No photographs of people
-- No stock-art feeling
-- Clean, geometric accents with subtle glow effects
+${siteConfig.ogImage.style}
 
 LOGO INTEGRATION:
-- The MOPerator logo features a geometric "M" mark made of overlapping angular shapes
-- Logo uses amber (#f59e0b) and gold (#fbbf24) on white elements
-- Place branding subtly in upper left or lower right
-- Include "THE MOPERATOR" text badge`,
-    messages: [
-      {
-        role: 'user',
-        content: `Create a detailed image generation prompt for an OpenGraph image (1200x630) for a blog post titled: "${title}"
+${siteConfig.ogImage.logoDescription}`,
+      messages: [
+        {
+          role: 'user',
+          content: `Create a detailed image generation prompt for an OpenGraph image (1200x630) for a blog post titled: "${title}"
 
-Description: ${description}
+Description: ${description || title}
 
-The image should incorporate The MOPerator brand identity with amber/gold accents on a dark background. Include subtle geometric patterns and the brand mark. Generate ONLY the prompt, nothing else.`,
-      },
-    ],
-    maxOutputTokens: 500,
-    temperature: 0.7,
-  })
+The image should incorporate the ${siteConfig.name} brand identity with accents on a dark background. Include subtle geometric patterns and the brand mark. Generate ONLY the prompt, nothing else.`,
+        },
+      ],
+      maxOutputTokens: 500,
+      temperature: 0.7,
+    })
 
-  // For now, we'll return the prompt and a placeholder
-  // In production, this would call an image generation API like fal.ai or DALL-E
-  return Response.json({ 
-    prompt: imagePrompt,
-    imageUrl: null, // Would contain generated image URL
-    message: 'Image prompt generated. Connect an image generation service (fal.ai, DALL-E) to generate the actual image.'
-  })
+    return Response.json({
+      prompt: imagePrompt,
+      imageUrl: null,
+      message: 'Image prompt generated. Connect an image generation service (fal.ai, DALL-E) to generate the actual image.'
+    })
+  } catch (error) {
+    console.error('OG generation error:', error)
+    const message = error instanceof Error ? error.message : 'Failed to generate OG image prompt'
+    return Response.json({ error: message }, { status: 500 })
+  }
 }
