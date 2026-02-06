@@ -98,13 +98,13 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
             style={{ border: `1px solid ${siteConfig.colors.secondary}` }}
           />
 
-          {/* Center logo watermark */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          {/* Center logo */}
+          <div className="absolute inset-0 flex items-center justify-center -translate-y-[15%]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/moperator-icon.svg"
               alt=""
-              className="w-24 h-24 opacity-[0.12]"
+              className="w-40 h-40 opacity-40"
             />
           </div>
 
