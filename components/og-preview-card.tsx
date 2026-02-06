@@ -41,17 +41,122 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
   }
 
   const handleDownloadPNG = useCallback(async () => {
-    if (!previewRef.current) return
     setDownloading(true)
     try {
-      const html2canvas = (await import('html2canvas')).default
-      const rect = previewRef.current.getBoundingClientRect()
-      const scale = 1200 / rect.width
-      const canvas = await html2canvas(previewRef.current, {
-        scale,
-        useCORS: true,
-        backgroundColor: null,
-      })
+      const W = 1200
+      const H = 630
+      const pad = 48
+      const canvas = document.createElement('canvas')
+      canvas.width = W
+      canvas.height = H
+      const ctx = canvas.getContext('2d')!
+
+      // Background gradient (135deg)
+      const bg = ctx.createLinearGradient(0, 0, W, H)
+      bg.addColorStop(0, siteConfig.colors.background)
+      bg.addColorStop(1, siteConfig.colors.backgroundGradientEnd)
+      ctx.fillStyle = bg
+      ctx.fillRect(0, 0, W, H)
+
+      // Grid overlay
+      ctx.strokeStyle = `${siteConfig.colors.primary}14`
+      ctx.lineWidth = 1
+      for (let x = 0; x <= W; x += 48) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke()
+      }
+      for (let y = 0; y <= H; y += 48) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke()
+      }
+
+      // Decorative circles
+      ctx.strokeStyle = `${siteConfig.colors.primary}10`
+      ctx.lineWidth = 2
+      ctx.beginPath(); ctx.arc(pad + 64, pad + 64, 64, 0, Math.PI * 2); ctx.stroke()
+      ctx.strokeStyle = `${siteConfig.colors.secondary}0A`
+      ctx.beginPath(); ctx.arc(W - 144, H - 96, 96, 0, Math.PI * 2); ctx.stroke()
+
+      // Radial glow accents
+      const topGlow = ctx.createRadialGradient(W, 0, 0, W, 0, 320)
+      topGlow.addColorStop(0, `${siteConfig.colors.primary}26`)
+      topGlow.addColorStop(1, 'transparent')
+      ctx.fillStyle = topGlow
+      ctx.fillRect(W - 320, 0, 320, 320)
+
+      const bottomGlow = ctx.createRadialGradient(0, H, 0, 0, H, 256)
+      bottomGlow.addColorStop(0, `${siteConfig.colors.secondary}14`)
+      bottomGlow.addColorStop(1, 'transparent')
+      ctx.fillStyle = bottomGlow
+      ctx.fillRect(0, H - 256, 256, 256)
+
+      // Logo (centered, shifted up 15%)
+      if (logoDataUri) {
+        const img = new Image()
+        img.src = logoDataUri
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve()
+          img.onerror = reject
+        })
+        const logoSize = 320
+        const logoX = (W - logoSize) / 2
+        const logoY = (H - logoSize) / 2 - H * 0.15
+        ctx.globalAlpha = 0.4
+        ctx.drawImage(img, logoX, logoY, logoSize, logoSize)
+        ctx.globalAlpha = 1
+      }
+
+      // Top badge: dot + brand name
+      ctx.fillStyle = siteConfig.colors.primary
+      ctx.shadowColor = `${siteConfig.colors.primary}99`
+      ctx.shadowBlur = 8
+      ctx.beginPath(); ctx.arc(pad + 8, pad + 8, 8, 0, Math.PI * 2); ctx.fill()
+      ctx.shadowBlur = 0
+      ctx.shadowColor = 'transparent'
+
+      ctx.font = '600 16px system-ui, -apple-system, sans-serif'
+      ctx.fillStyle = siteConfig.colors.primary
+      ctx.textBaseline = 'middle'
+      ctx.letterSpacing = '2px'
+      ctx.fillText(siteConfig.name.toUpperCase(), pad + 24, pad + 8)
+      ctx.letterSpacing = '0px'
+
+      // Domain text (bottom)
+      ctx.font = '400 22px system-ui, -apple-system, sans-serif'
+      ctx.fillStyle = siteConfig.colors.textMuted
+      ctx.textBaseline = 'alphabetic'
+      const domainY = H - pad
+      ctx.fillText(siteConfig.domain, pad, domainY)
+
+      // Title text (word-wrapped, above domain)
+      ctx.font = '600 42px system-ui, -apple-system, sans-serif'
+      ctx.fillStyle = siteConfig.colors.text
+      const displayTitle = title || 'Your Post Title'
+      const words = displayTitle.split(' ')
+      const maxWidth = W - pad * 2
+      const lines: string[] = []
+      let currentLine = ''
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word
+        if (ctx.measureText(testLine).width > maxWidth) {
+          lines.push(currentLine)
+          currentLine = word
+        } else {
+          currentLine = testLine
+        }
+      }
+      if (currentLine) lines.push(currentLine)
+      const displayLines = lines.slice(0, 3)
+      if (lines.length > 3) {
+        displayLines[2] = displayLines[2].replace(/\s+\S+$/, '...')
+      }
+
+      const lineHeight = 52
+      const titleBottomY = domainY - 32
+      for (let i = displayLines.length - 1; i >= 0; i--) {
+        const y = titleBottomY - (displayLines.length - 1 - i) * lineHeight
+        ctx.fillText(displayLines[i], pad, y)
+      }
+
+      // Download
       const link = document.createElement('a')
       link.download = `${title ? title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : 'og-image'}.png`
       link.href = canvas.toDataURL('image/png')
@@ -61,7 +166,7 @@ export function OGPreviewCard({ ogData, title }: OGPreviewCardProps) {
     } finally {
       setDownloading(false)
     }
-  }, [title])
+  }, [title, logoDataUri])
 
   if (!ogData) {
     return (
